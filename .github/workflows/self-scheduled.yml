@@ -15,6 +15,12 @@ on:
       slack_report_channel:
         required: true
         type: string
+      runner:
+        required: true
+        type: string
+      docker:
+        required: true
+        type: string
 
 env:
   HF_HOME: /mnt/cache
@@ -38,7 +44,7 @@ jobs:
     strategy:
       matrix:
         machine_type: [single-gpu, multi-gpu]
-    runs-on: ['${{ matrix.machine_type }}', nvidia-gpu, t4, daily-ci]
+    runs-on: ['${{ matrix.machine_type }}', nvidia-gpu, t4, '${{ inputs.runner }}']
     container:
       image: huggingface/transformers-all-latest-gpu
       options: --gpus 0 --shm-size "16gb" --ipc host -v /mnt/cache/.cache/huggingface:/mnt/cache/
@@ -96,6 +102,8 @@ jobs:
       folder_slices: ${{ needs.setup.outputs.folder_slices }}
       machine_type: ${{ matrix.machine_type }}
       slice_id: ${{ matrix.slice_id }}
+      runner: ${{ inputs.runner }}
+      docker: ${{ inputs.docker }}
     secrets: inherit
 
   run_pipelines_torch_gpu:
@@ -105,7 +113,7 @@ jobs:
       fail-fast: false
       matrix:
         machine_type: [single-gpu, multi-gpu]
-    runs-on: ['${{ matrix.machine_type }}', nvidia-gpu, t4, daily-ci]
+    runs-on: ['${{ matrix.machine_type }}', nvidia-gpu, t4, '${{ inputs.runner }}']
     container:
       image: huggingface/transformers-pytorch-gpu
       options: --gpus all --shm-size "16gb" --ipc host -v /mnt/cache/.cache/huggingface:/mnt/cache/
@@ -155,7 +163,7 @@ jobs:
       fail-fast: false
       matrix:
         machine_type: [single-gpu, multi-gpu]
-    runs-on: ['${{ matrix.machine_type }}', nvidia-gpu, t4, daily-ci]
+    runs-on: ['${{ matrix.machine_type }}', nvidia-gpu, t4, '${{ inputs.runner }}']
     container:
       image: huggingface/transformers-tensorflow-gpu
       options: --gpus all --shm-size "16gb" --ipc host -v /mnt/cache/.cache/huggingface:/mnt/cache/
@@ -206,7 +214,7 @@ jobs:
       fail-fast: false
       matrix:
         machine_type: [single-gpu]
-    runs-on: ['${{ matrix.machine_type }}', nvidia-gpu, t4, daily-ci]
+    runs-on: ['${{ matrix.machine_type }}', nvidia-gpu, t4, '${{ inputs.runner }}']
     container:
       image: huggingface/transformers-all-latest-gpu
       options: --gpus 0 --shm-size "16gb" --ipc host -v /mnt/cache/.cache/huggingface:/mnt/cache/
@@ -257,9 +265,10 @@ jobs:
       fail-fast: false
       matrix:
         machine_type: [single-gpu, multi-gpu]
-    runs-on: ['${{ matrix.machine_type }}', nvidia-gpu, t4, daily-ci]
+    runs-on: ['${{ matrix.machine_type }}', nvidia-gpu, t4, '${{ inputs.runner }}']
     container:
-      image: huggingface/transformers-pytorch-deepspeed-latest-gpu
+#      image: huggingface/transformers-pytorch-deepspeed-latest-gpu
+      image: ${{ inputs.docker }}
       options: --gpus all --shm-size "16gb" --ipc host -v /mnt/cache/.cache/huggingface:/mnt/cache/
     steps:
       - name: Update clone
@@ -274,11 +283,22 @@ jobs:
         run: rm -rf /github/home/.cache/torch_extensions/
 
       # To avoid unknown test failures
-      - name: Pre build DeepSpeed *again*
+      - name: Pre build DeepSpeed *again* (for daily CI)
+        if: ${{ inputs.docker == 'huggingface/transformers-pytorch-deepspeed-latest-gpu' }}
         working-directory: /workspace
         run: |
           python3 -m pip uninstall -y deepspeed
           DS_DISABLE_NINJA=1 DS_BUILD_CPU_ADAM=1 DS_BUILD_FUSED_ADAM=1 python3 -m pip install deepspeed --global-option="build_ext" --global-option="-j8" --no-cache -v --disable-pip-version-check
+
+      # To avoid unknown test failures
+      - name: Pre build DeepSpeed *again* (for nightly CI)
+        if: ${{ inputs.docker == 'huggingface/transformers-pytorch-deepspeed-nightly-gpu' }}
+        working-directory: /workspace
+        run: |
+          python3 -m pip uninstall -y deepspeed
+          rm -rf DeepSpeed
+          git clone https://github.com/microsoft/DeepSpeed && cd DeepSpeed && rm -rf build
+          DS_BUILD_CPU_ADAM=1 DS_BUILD_FUSED_ADAM=1 python3 -m pip install . --global-option="build_ext" --global-option="-j8" --no-cache -v --disable-pip-version-check
 
       - name: NVIDIA-SMI
         run: |
@@ -319,7 +339,7 @@ jobs:
       matrix:
         folders: ${{ fromJson(needs.setup.outputs.quantization_matrix) }}
         machine_type: [single-gpu, multi-gpu]
-    runs-on: ['${{ matrix.machine_type }}', nvidia-gpu, t4, daily-ci]
+    runs-on: ['${{ matrix.machine_type }}', nvidia-gpu, t4, '${{ inputs.runner }}']
     container:
       image: huggingface/transformers-quantization-latest-gpu
       options: --gpus all --shm-size "16gb" --ipc host -v /mnt/cache/.cache/huggingface:/mnt/cache/

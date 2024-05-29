@@ -12,6 +12,12 @@ on:
       slice_id:
         required: true
         type: number
+      runner:
+        required: true
+        type: string
+      docker:
+        required: true
+        type: string
 
 env:
   HF_HOME: /mnt/cache
@@ -34,9 +40,9 @@ jobs:
       fail-fast: false
       matrix:
         folders: ${{ fromJson(inputs.folder_slices)[inputs.slice_id] }}
-    runs-on: ['${{ inputs.machine_type }}', nvidia-gpu, t4, daily-ci]
+    runs-on: ['${{ inputs.machine_type }}', nvidia-gpu, t4, '${{ inputs.runner }}']
     container:
-      image: huggingface/transformers-all-latest-gpu
+      image: ${{ inputs.docker }}
       options: --gpus all --shm-size "16gb" --ipc host -v /mnt/cache/.cache/huggingface:/mnt/cache/
     steps:
       - name: Echo input and matrix info

@@ -1,0 +1,39 @@
+name: Self-hosted runner (nightly-ci)
+
+
+on:
+  repository_dispatch:
+  schedule:
+    - cron: "17 2 * * *"
+  push:
+    branches:
+      - build-cleanup-docker-build
+
+jobs:
+  build_nightly_ci_images:
+    name: Build Nightly CI Docker Images
+    if: (github.event_name == 'schedule') || ((github.event_name == 'push') && startsWith(github.ref_name, 'build-cleanup-docker-build'))
+    uses: ./.github/workflows/build-nightly-ci-docker-images.yml
+    secrets: inherit
+
+  model-ci:
+    name: Model CI
+    needs: [build_nightly_ci_images]
+    uses: ./.github/workflows/self-scheduled.yml
+    with:
+      job: run_models_gpu
+      slack_report_channel: "#transformers-ci-past-future"
+      runner: daily-ci
+      docker: huggingface/transformers-all-latest-torch-nightly-gpu
+    secrets: inherit
+
+  deepspeed-ci:
+    name: DeepSpeed CI
+    needs: [build_nightly_ci_images]
+    uses: ./.github/workflows/self-scheduled.yml
+    with:
+      job: run_torch_cuda_extensions_gpu
+      slack_report_channel: "#transformers-ci-past-future"
+      runner: daily-ci
+      docker: huggingface/transformers-pytorch-deepspeed-nightly-gpu
+    secrets: inherit
