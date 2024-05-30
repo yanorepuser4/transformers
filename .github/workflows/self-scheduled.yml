@@ -274,7 +274,6 @@ jobs:
         machine_type: [single-gpu, multi-gpu]
     runs-on: ['${{ matrix.machine_type }}', nvidia-gpu, t4, '${{ inputs.runner }}']
     container:
-#      image: huggingface/transformers-pytorch-deepspeed-latest-gpu
       image: ${{ inputs.docker }}
       options: --gpus all --shm-size "16gb" --ipc host -v /mnt/cache/.cache/huggingface:/mnt/cache/
     steps:
@@ -298,7 +297,7 @@ jobs:
 
       # To avoid unknown test failures
       - name: Pre build DeepSpeed *again* (for daily CI)
-        if: ${{ inputs.docker == 'huggingface/transformers-pytorch-deepspeed-latest-gpu' }}
+        if: ${{ contains(inputs.ci_event, 'Daily CI') }}
         working-directory: ${{ inputs.working-directory-prefix }}/
         run: |
           python3 -m pip uninstall -y deepspeed

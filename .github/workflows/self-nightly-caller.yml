@@ -36,7 +36,8 @@ jobs:
       job: run_torch_cuda_extensions_gpu
       slack_report_channel: "#transformers-ci-past-future"
       runner: ci
-      docker: huggingface/transformers-pytorch-deepspeed-nightly-gpu
+      # TODO: comment
+      docker: huggingface/transformers-pytorch-deepspeed-latest-gpu
       ci_event: Nightly CI
       working-directory-prefix: /workspace
     secrets: inherit
