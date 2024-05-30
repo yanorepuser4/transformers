@@ -3,39 +3,23 @@ name: Self-hosted runner (nightly-past-ci-caller)
 on:
   schedule:
     # 2:17 am on each Sunday and Thursday
-
     - cron: "17 2 * * 0,4"
   push:
     branches:
-      - run_nightly_ci*
       - run_past_ci*
       - build-cleanup-docker-build-temp
 
 jobs:
-#  build_nightly_ci_images:
-#    name: Build Nightly CI Docker Images
-#    if: (github.event_name == 'schedule') || ((github.event_name == 'push') && startsWith(github.ref_name, 'run_nightly_ci'))
-#    uses: ./.github/workflows/build-nightly-ci-docker-images.yml
-#    secrets: inherit
-
-  run_nightly_ci:
-    name: Nightly CI
-#    needs: [build_nightly_ci_images]
-    uses: ./.github/workflows/self-nightly-scheduled.yml
+  run_past_ci_pytorch_1-13:
+    name: PyTorch 1.13
+    if: (cancelled() != true) && ((github.event_name == 'schedule') || ((github.event_name == 'push') && startsWith(github.ref_name, 'run_past_ci')))
+    needs: [run_nightly_ci]
+    uses: ./.github/workflows/self-past-caller.yml
     with:
-      job: run_models_gpu
+      framework: pytorch
+      version: "1.13"
+      sha: ${{ github.sha }}
     secrets: inherit
-#
-#  run_past_ci_pytorch_1-13:
-#    name: PyTorch 1.13
-#    if: (cancelled() != true) && ((github.event_name == 'schedule') || ((github.event_name == 'push') && startsWith(github.ref_name, 'run_past_ci')))
-#    needs: [run_nightly_ci]
-#    uses: ./.github/workflows/self-past.yml
-#    with:
-#      framework: pytorch
-#      version: "1.13"
-#      sha: ${{ github.sha }}
-#    secrets: inherit
 #
 #  run_past_ci_pytorch_1-12:
 #    name: PyTorch 1.12
