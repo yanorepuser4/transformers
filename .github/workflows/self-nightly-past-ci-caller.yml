@@ -15,7 +15,10 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Get number
-        run: echo "${{ vars.GITHUB_RUN_NUMBER }}"
+        run: |
+          echo "${{ vars.GITHUB_RUN_NUMBER }}"
+          echo "${{ env.GITHUB_RUN_NUMBER }}"
+          echo $GITHUB_RUN_NUMBER
 
 #  run_past_ci_pytorch_1-13:
 #    name: PyTorch 1.13
