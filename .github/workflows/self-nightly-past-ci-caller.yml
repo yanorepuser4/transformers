@@ -12,6 +12,7 @@ on:
 jobs:
   get_number:
     name: Get number
+    if: $GITHUB_RUN_NUMBER == 180
     runs-on: ubuntu-22.04
     steps:
       - name: Get number
