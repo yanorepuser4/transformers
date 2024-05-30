@@ -12,7 +12,7 @@ on:
 jobs:
   get_number:
     name: Get number
-    if: ${{ vars.GITHUB_RUN_NUMBER == 183 }}
+    if: ${{ vars.GITHUB_RUN_NUMBER == '184' }}
     runs-on: ubuntu-22.04
     steps:
       - name: Get number
