@@ -282,6 +282,14 @@ jobs:
         working-directory: /workspace/transformers
         run: python3 -m pip uninstall -y transformers && python3 -m pip install -e .
 
+      - name: Update / Install some packages (for Past CI)
+        if: ${{ contains(inputs.docker, '-past-') }}
+        # TODO: the correct path
+        working-directory: /transformers
+        run: |
+          python3 -m pip install -U datasets
+          python3 -m pip install --no-cache-dir git+https://github.com/huggingface/accelerate@main#egg=accelerate
+
       - name: Remove cached torch extensions
         run: rm -rf /github/home/.cache/torch_extensions/
 
