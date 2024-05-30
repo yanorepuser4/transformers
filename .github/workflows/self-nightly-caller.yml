@@ -38,4 +38,5 @@ jobs:
       runner: ci
       docker: huggingface/transformers-pytorch-deepspeed-nightly-gpu
       ci_event: Nightly CI
+      working-directory-prefix: /workspace
     secrets: inherit

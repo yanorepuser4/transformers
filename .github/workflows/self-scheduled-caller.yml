@@ -63,6 +63,7 @@ jobs:
       runner: daily-ci
       docker: huggingface/transformers-pytorch-deepspeed-latest-gpu
       ci_event: Daily CI
+      working-directory-prefix: /workspace
     secrets: inherit
 
   quantization-ci:

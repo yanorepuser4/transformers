@@ -25,7 +25,8 @@ on:
         required: true
         type: string
       working-directory-prefix:
-        required: true
+        default: ''
+        required: false
         type: string
 
 env:
@@ -287,8 +288,7 @@ jobs:
 
       - name: Update / Install some packages (for Past CI)
         if: ${{ contains(inputs.docker, '-past-') }}
-        # TODO: the correct path
-        working-directory: /transformers
+        working-directory: ${{ inputs.working-directory-prefix }}/transformers
         run: |
           python3 -m pip install -U datasets
           python3 -m pip install --no-cache-dir git+https://github.com/huggingface/accelerate@main#egg=accelerate
