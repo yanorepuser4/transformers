@@ -8,7 +8,7 @@ on:
   push:
     branches:
       - run_scheduled_ci*
-      - build-cleanup-docker-build
+      - build-cleanup-docker-build-temp
 
 jobs:
   model-ci:
