@@ -10,15 +10,22 @@ on:
       - build-cleanup-docker-build-temp
 
 jobs:
-  run_past_ci_pytorch_1-13:
-    name: PyTorch 1.13
-    if: (cancelled() != true) && ((github.event_name == 'schedule') || ((github.event_name == 'push') && startsWith(github.ref_name, 'build-cleanup-docker-build')))
-    uses: ./.github/workflows/self-past-caller.yml
-    with:
-      framework: pytorch
-      version: "1.13"
-      sha: ${{ github.sha }}
-    secrets: inherit
+  get_number:
+    name: Get number
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Get number
+        run: echo "${{ env.GITHUB_RUN_ATTEMPT }}"
+
+#  run_past_ci_pytorch_1-13:
+#    name: PyTorch 1.13
+#    if: (cancelled() != true) && ((github.event_name == 'schedule') || ((github.event_name == 'push') && startsWith(github.ref_name, 'build-cleanup-docker-build')))
+#    uses: ./.github/workflows/self-past-caller.yml
+#    with:
+#      framework: pytorch
+#      version: "1.13"
+#      sha: ${{ github.sha }}
+#    secrets: inherit
 #
 #  run_past_ci_pytorch_1-12:
 #    name: PyTorch 1.12
