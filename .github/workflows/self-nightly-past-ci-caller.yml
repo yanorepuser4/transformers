@@ -12,14 +12,14 @@ on:
 jobs:
   get_number:
     name: Get number
-    if: ${{ vars.GITHUB_RUN_NUMBER == '184' }}
+    if: ${{ github.run_number == '185' }}
     runs-on: ubuntu-22.04
     steps:
       - name: Get number
         run: |
           echo "${{ vars.GITHUB_RUN_NUMBER }}"
           echo "${{ env.GITHUB_RUN_NUMBER }}"
-          echo $GITHUB_RUN_NUMBER
+          echo "${{ github.run_number }}"
 
 #  run_past_ci_pytorch_1-13:
 #    name: PyTorch 1.13
