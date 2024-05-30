@@ -24,7 +24,7 @@ on:
       ci_event:
         required: true
         type: string
-      prefix:
+      working-directory-prefix:
         required: true
         type: string
 
@@ -278,11 +278,11 @@ jobs:
       options: --gpus all --shm-size "16gb" --ipc host -v /mnt/cache/.cache/huggingface:/mnt/cache/
     steps:
       - name: Update clone
-        working-directory: ${{ inputs.prefix }}/transformers
+        working-directory: ${{ inputs.working-directory-prefix }}/transformers
         run: git fetch && git checkout ${{ github.sha }}
 
       - name: Reinstall transformers in edit mode (remove the one installed during docker image build)
-        working-directory: ${{ inputs.prefix }}/transformers
+        working-directory: ${{ inputs.working-directory-prefix }}/transformers
         run: python3 -m pip uninstall -y transformers && python3 -m pip install -e .
 
       - name: Update / Install some packages (for Past CI)
@@ -299,7 +299,7 @@ jobs:
       # To avoid unknown test failures
       - name: Pre build DeepSpeed *again* (for daily CI)
         if: ${{ inputs.docker == 'huggingface/transformers-pytorch-deepspeed-latest-gpu' }}
-        working-directory: ${{ inputs.prefix }}/
+        working-directory: ${{ inputs.working-directory-prefix }}/
         run: |
           python3 -m pip uninstall -y deepspeed
           DS_DISABLE_NINJA=1 DS_BUILD_CPU_ADAM=1 DS_BUILD_FUSED_ADAM=1 python3 -m pip install deepspeed --global-option="build_ext" --global-option="-j8" --no-cache -v --disable-pip-version-check
@@ -307,7 +307,7 @@ jobs:
       # To avoid unknown test failures
       - name: Pre build DeepSpeed *again* (for nightly CI)
         if: ${{ inputs.docker == 'huggingface/transformers-pytorch-deepspeed-nightly-gpu' }}
-        working-directory: ${{ inputs.prefix }}/
+        working-directory: ${{ inputs.working-directory-prefix }}/
         run: |
           python3 -m pip uninstall -y deepspeed
           rm -rf DeepSpeed
@@ -319,30 +319,30 @@ jobs:
           nvidia-smi
 
       - name: Environment
-        working-directory: ${{ inputs.prefix }}/transformers
+        working-directory: ${{ inputs.working-directory-prefix }}/transformers
         run: |
           python utils/print_env.py
 
       - name: Show installed libraries and their versions
-        working-directory: ${{ inputs.prefix }}/transformers
+        working-directory: ${{ inputs.working-directory-prefix }}/transformers
         run: pip freeze
 
       - name: Run all tests on GPU
-        working-directory: ${{ inputs.prefix }}/transformers
+        working-directory: ${{ inputs.working-directory-prefix }}/transformers
         run: |
           python -m pytest -v --make-reports=${{ matrix.machine_type }}_run_torch_cuda_extensions_gpu_test_reports tests/deepspeed tests/extended
 
       - name: Failure short reports
         if: ${{ failure() }}
         continue-on-error: true
-        run: cat ${{ inputs.prefix }}/transformers/reports/${{ matrix.machine_type }}_run_torch_cuda_extensions_gpu_test_reports/failures_short.txt
+        run: cat ${{ inputs.working-directory-prefix }}/transformers/reports/${{ matrix.machine_type }}_run_torch_cuda_extensions_gpu_test_reports/failures_short.txt
 
       - name: "Test suite reports artifacts: ${{ matrix.machine_type }}_run_torch_cuda_extensions_gpu_test_reports"
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.machine_type }}_run_torch_cuda_extensions_gpu_test_reports
-          path: ${{ inputs.prefix }}/transformers/reports/${{ matrix.machine_type }}_run_torch_cuda_extensions_gpu_test_reports
+          path: ${{ inputs.working-directory-prefix }}/transformers/reports/${{ matrix.machine_type }}_run_torch_cuda_extensions_gpu_test_reports
 
   run_quantization_torch_gpu:
     if: ${{ inputs.job == 'run_quantization_torch_gpu' }}
