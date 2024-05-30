@@ -287,7 +287,7 @@ jobs:
         run: python3 -m pip uninstall -y transformers && python3 -m pip install -e .
 
       - name: Update / Install some packages (for Past CI)
-        if: ${{ contains(inputs.docker, '-past-') }}
+        if: ${{ contains(inputs.docker, '-past-') && contains(inputs.docker, '-pytorch-') }}
         working-directory: ${{ inputs.working-directory-prefix }}/transformers
         run: |
           python3 -m pip install -U datasets
