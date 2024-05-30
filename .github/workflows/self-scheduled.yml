@@ -321,7 +321,7 @@ jobs:
       - name: Environment
         working-directory: ${{ inputs.working-directory-prefix }}/transformers
         run: |
-          python utils/print_env.py
+          python3 utils/print_env.py
 
       - name: Show installed libraries and their versions
         working-directory: ${{ inputs.working-directory-prefix }}/transformers
@@ -330,7 +330,7 @@ jobs:
       - name: Run all tests on GPU
         working-directory: ${{ inputs.working-directory-prefix }}/transformers
         run: |
-          python -m pytest -v --make-reports=${{ matrix.machine_type }}_run_torch_cuda_extensions_gpu_test_reports tests/deepspeed tests/extended
+          python3 -m pytest -v --make-reports=${{ matrix.machine_type }}_run_torch_cuda_extensions_gpu_test_reports tests/deepspeed tests/extended
 
       - name: Failure short reports
         if: ${{ failure() }}
