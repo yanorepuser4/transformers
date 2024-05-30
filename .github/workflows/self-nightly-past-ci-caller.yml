@@ -7,7 +7,7 @@ on:
   push:
     branches:
       - run_past_ci*
-      - build-cleanup-docker-build
+      - build-cleanup-docker-build-temp
 
 jobs:
   run_past_ci_pytorch_1-13:
