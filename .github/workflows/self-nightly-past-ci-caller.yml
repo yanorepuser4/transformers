@@ -12,7 +12,7 @@ on:
 jobs:
   get_number:
     name: Get number
-    if: $GITHUB_RUN_NUMBER == 180
+    if: ${{ env.GITHUB_RUN_NUMBER == 181 }}
     runs-on: ubuntu-22.04
     steps:
       - name: Get number
