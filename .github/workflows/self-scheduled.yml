@@ -21,6 +21,9 @@ on:
       docker:
         required: true
         type: string
+      ci_event:
+        required: true
+        type: string
 
 env:
   HF_HOME: /mnt/cache
@@ -454,5 +457,6 @@ jobs:
       # This would be an empty string if `setup` is skipped.
       folder_slices: ${{ needs.setup.outputs.folder_slices }}
       quantization_matrix: ${{ needs.setup.outputs.quantization_matrix }}
-      
+      ci_event: ${{ inputs.ci_event }}
+
     secrets: inherit

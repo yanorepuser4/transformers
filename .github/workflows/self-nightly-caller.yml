@@ -25,6 +25,7 @@ jobs:
       slack_report_channel: "#transformers-ci-past-future"
       runner: daily-ci
       docker: huggingface/transformers-all-latest-torch-nightly-gpu
+      ci_event: Nightly CI
     secrets: inherit
 
   deepspeed-ci:
@@ -36,4 +37,5 @@ jobs:
       slack_report_channel: "#transformers-ci-past-future"
       runner: daily-ci
       docker: huggingface/transformers-pytorch-deepspeed-nightly-gpu
+      ci_event: Nightly CI
     secrets: inherit
