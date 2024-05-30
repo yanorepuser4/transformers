@@ -30,7 +30,7 @@ jobs:
 
   deepspeed-ci:
     name: DeepSpeed CI
-    needs: [build_nightly_ci_images]
+#    needs: [build_nightly_ci_images]
     uses: ./.github/workflows/self-scheduled.yml
     with:
       job: run_torch_cuda_extensions_gpu
