@@ -13,7 +13,6 @@ jobs:
   run_past_ci_pytorch_1-13:
     name: PyTorch 1.13
     if: (cancelled() != true) && ((github.event_name == 'schedule') || ((github.event_name == 'push') && startsWith(github.ref_name, 'build-cleanup-docker-build')))
-    needs: [run_nightly_ci]
     uses: ./.github/workflows/self-past-caller.yml
     with:
       framework: pytorch
